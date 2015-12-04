@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<widget id="refkit.widget.InputRefSelector" needsEntityContext="true" xmlns="http://www.mendix.com/widget/1.0/">
+    <name>InputRefSelector</name>
+    <description>Input Reference Selector</description>
+    <icon>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACx
+        jwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAmVJREFU
+        OE/NU11okmEUFoIu6qq7ioLoQoplbdLaLmqbW0jbtKE1kMbmxXS2aRdmYf4Q6JBsTcq/Ga3WRXQj
+        KfTDapAjxRhbJE5z05ztp4YG09l+/GZuPPmNgjXX1W564YHD857zvA/vOYcCgLIdbKuYfPg/Eaio
+        qNjd0dFxXafTpfr6+qBWq6clEklZHnvzcYzkyDsyh8zd+GcUOp2+k8VidRmNRiQSCcRiMbjdbmg0
+        mi8qlcoTiURWSM7r9cLeexXhpzxEn+vgf8TEqLWohVJSUnJeJpOlQ6FQisfj9dfX168KhUKYTCYo
+        FAqQMclZNFX++KAc6cArYHEW84FnGOo+lyAddGm1WsJsNosaGhp2VVZWLrpcLvh8Png8HjgcDsgv
+        lxKp0M1s9usLxN/dQSboxOqUF8HHbQSFRqO1i0Si+Z6enmtcLneAwWD8ZDKZ4HA465C1nUYyqMZa
+        xotMTILkyBWMP2lFoLd5bsTEoVKO5g+bzR43GAzzdrs96XQ6YbPZIJVKYdXzkQoqsEYMYXmCD2Km
+        CQtjSkzYquY+Gs4Wr88BlUrdkbddXFdXNykQCJbEYjGRR/aulG6Jf5D/Lm4BMX0JPz6pELVULwX1
+        paf+dGLLQerv3Hdh7I0su5bxgJhsxcpMM9J5J1FrTSbcXX7orzZu3oOH7QdbQ/1KjL6+h2/DjVie
+        bELSfwOfLYzvYUP54c35BQ7st2uAhSmEH1zEoHI/3t+vhVt7cjagLzu21dIVCHQKi3LZIQuyw0YM
+        6xiwCw4sDiiOn/jXxhYINJ7ZQ9ziH8m59LW5t4Zq90s5rcD2RrFfZHS3WnqD4D4AAAAASUVORK5C
+        YII=
+    </icon>
+    <properties>
+        <property key="objreference" type="entity" isPath="yes" pathType="reference">
+            <caption>Association</caption>
+            <category>Data source</category>
+            <description>Target association</description>
+        </property>
+        <property key="objattribute" type="attribute" entityProperty="objreference">
+            <caption>Attribute</caption>
+            <category>Data source</category>
+            <description>Attribute to search on</description>
+            <attributeTypes>
+                <attributeType name="AutoNumber"/>
+                <attributeType name="Currency"/>
+                <attributeType name="Enum"/>
+                <attributeType name="Float"/>
+                <attributeType name="Integer"/>
+                <attributeType name="Long"/>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="constraints" type="entityConstraint" entityProperty="objreference" required="false">
+            <caption>Constraint</caption>
+            <category>Data source</category>
+            <description>Constraint to constrain selectable objects</description>
+        </property>
+        <property key="fetchmethod" type="enumeration" defaultValue="startswith">
+            <caption>Search method</caption>
+            <category>Behavior</category>
+            <description>Search method used for showing suggestions</description>
+            <enumerationValues>
+                <enumerationValue key="startswith">starts-with</enumerationValue>
+                <enumerationValue key="contains">contains</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="autocomplete" type="boolean" defaultValue="true">
+            <caption>Autocomplete</caption>
+            <category>Behavior</category>
+            <description>Autocomplete user input</description>
+        </property>
+        <property key="searchempty" type="boolean" defaultValue="true">
+            <caption>Search on empty input</caption>
+            <category>Behavior</category>
+            <description>Search on empty input</description>
+        </property>
+        <property key="suggestions" type="integer" defaultValue="5">
+            <caption>Number of suggestions</caption>
+            <category>Behavior</category>
+            <description>Number of suggestions to show</description>
+        </property>
+        <property key="searchdelay" type="integer" defaultValue="300">
+            <caption>Search delay</caption>
+            <category>Behavior</category>
+            <description>Search delay</description>
+        </property>
+        <property key="onchangemf" type="microflow" required="false">
+            <caption>On change</caption>
+            <category>Behavior</category>
+            <description>Microflow to trigger on change</description>
+            <returnType type="Void"/>
+        </property>
+		<property key="notfoundmf" type="microflow" required="false">
+            <caption>On not found</caption>
+            <category>Behavior</category>
+            <description>Microflow to trigger when the string doesn't match any objects</description>
+            <returnType type="Void"/>
+        </property>
+        <property key="ignored1" type="object" isList="true" required="false">
+            <caption>Sort order</caption>
+            <category>Data source</category>
+            <description>The sort order of the objects</description>
+            <properties>
+                <property key="sortattrs" type="attribute" isPath="optional" pathType="reference" entityProperty="../objreference">
+                    <caption>Attribute</caption>
+                    <category>Data source</category>
+                    <description>An attribute to sort on</description>
+                    <attributeTypes>
+                        <attributeType name="AutoNumber"/>
+                        <attributeType name="Boolean"/>
+                        <attributeType name="Currency"/>
+                        <attributeType name="DateTime"/>
+                        <attributeType name="Enum"/>
+                        <attributeType name="Float"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="String"/>
+                    </attributeTypes>
+                </property>
+                <property key="sortorder" type="enumeration" defaultValue="asc">
+                    <caption>Order</caption>
+                    <category>Data source</category>
+                    <description>The order in which to sort</description>
+                    <enumerationValues>
+                        <enumerationValue key="asc">Ascending</enumerationValue>
+                        <enumerationValue key="desc">Descending</enumerationValue>
+                    </enumerationValues>
+                </property>
+            </properties>
+        </property>
+    </properties>
+</widget>

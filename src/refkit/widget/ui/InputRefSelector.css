@@ -1,0 +1,27 @@
+.refkitInputRefSelector {
+	width: auto;
+}
+
+.tundra .refkitInputRefSelector .dijitTextBox {
+	border: 0 none;
+	background: transparent none;
+	width: 100%;
+
+	margin: 0;
+	padding: 0;
+}
+
+.refkitInputRefSelector input:focus,
+.refkitInputRefSelector textarea:focus,
+.refkitInputRefSelector select:focus {
+	box-shadow: none !important;
+	border: 0 none;
+}
+
+/* ie again, wrong font family, wrong dijit fix */
+.dj_ie .refkitInputRefSelector .dijitTextBox input {
+	margin-top: 0px !important;
+	font-family: arial,helvetica,clean,sans-serif !important;
+}
+
+
