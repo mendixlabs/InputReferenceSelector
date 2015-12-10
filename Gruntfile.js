@@ -19,7 +19,7 @@ module.exports = function (grunt) {
     watch: {
       autoDeployUpdate: {
         "files": [ "./src/**/*" ],
-        "tasks": [ "newer:copy", "compress" ],
+        "tasks": [ "compress", "copy" ],
         options: {
           debounceDelay: 250,
           livereload: true
