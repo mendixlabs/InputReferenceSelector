@@ -4,76 +4,20 @@
 logger.level(logger.ALL);
 
 define([
-
-    // Mixins
     "dojo/_base/declare", "mxui/widget/_WidgetBase", "dijit/_TemplatedMixin",
-
-    // Client API and DOJO functions
-    "mxui/dom",
-    "dojo/dom",
-    "dojo/query",
-    "dojo/dom-prop",
-    "dojo/dom-geometry",
-    "dojo/dom-class",
-    "dojo/dom-attr",
-    "dojo/dom-style",
-    "dojo/_base/window",
-    "dojo/dom-construct",
-    "dojo/_base/array",
-    "dojo/_base/lang",
-    "dojo/html",
-    "dojo/ready",
-
-    "mendix/lib/MxContext",
-
-    "dijit/form/ComboBox",
-
-    // External libraries
+    "mxui/dom", "dojo/dom", "dojo/_base/array", "dojo/_base/lang",
+    "mendix/lib/MxContext", "dijit/form/ComboBox",
     "refkit/lib/XPathSource",
     "refkit/lib/jquery",
-
-    // Templates
     "dojo/text!refkit/templates/InputReferenceSelector.html"
-
-], function (
-
-       // Mixins
-       declare,
-       _WidgetBase,
-       _TemplatedMixin,
-
-        // Client API and DOJO functions
-        dom,
-        dojoDom,
-        domQuery,
-        domProp,
-        domGeom,
-        domClass,
-        domAttr,
-        domStyle,
-        win,
-        domConstruct,
-        dojoArray,
-        dojolang,
-        html,
-        ready,
-
-        MxContext,
-
-        ComboBox,
-
-        XPathSource,
-        _jQuery,
-
-        // Templates
-        template) {
+], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoArray, dojoLang, MxContext, ComboBox, XPathSource, _jQuery, template) {
 
     "use strict";
 
     var $ = _jQuery.noConflict(true);
 
     // Declare widget.
-    return declare("refkit.widget.InputRefSelector", [_WidgetBase, _TemplatedMixin], {
+    return declare("refkit.widget.InputRefSelector", [ _WidgetBase, _TemplatedMixin ], {
 
         // Template path
         templateString: template,
@@ -280,16 +224,16 @@ define([
             var self = this;
 
             $('div#' + this.id).focusin(function() {
-               $(this).addClass('MxClient_Focus');
-               $(this).css('outline', '#333 auto 2px');
-               if ($('div#' + self.id + ' div').hasClass('dijitTextBoxFocused')) {
+                $(this).addClass('MxClient_Focus');
+                $(this).css('outline', '#333 auto 2px');
+                if ($('div#' + self.id + ' div').hasClass('dijitTextBoxFocused')) {
                     $('div#' + self.id + ' div').css('outline', 'rgb(0, 0, 0) auto 0px');
-               }
+                }
             });
 
             $('div#' + this.id).focusout(function() {
-               $(this).removeClass('MxClient_Focus');
-               $(this).css('outline', 'transparent auto 0px');
+                $(this).removeClass('MxClient_Focus');
+                $(this).css('outline', 'transparent auto 0px');
             });
 
             setTimeout(function() { self.ignoreChange = false; }, 10);
@@ -299,7 +243,7 @@ define([
             logger.debug(this.id + ".valueChange", value, target);
             if (!this.ignoreChange) {
                 this.ignoreChange = true;
-                this.getGuid(dojo.hitch(this, function(guid) {
+                this.getGuid(dojoLang.hitch(this, function(guid) {
                     if (guid === "" && this.notfoundmf !== "") {
                         mx.data.create({
                             entity: this.referredEntity,
@@ -341,7 +285,7 @@ define([
                     actionname : mf,
                     context    : context,
                     store: {
-                      caller: this.mxform
+                        caller: this.mxform
                     },
                     callback   : function() {
                         // ok
@@ -391,7 +335,6 @@ define([
                             callback(objs[0].getGuid());
                         } else {
                             logger.warn(this.id + ".onBlur: There is more than one object found, so change is ignored");
-
                             this.setDisplayValue("");
                             callback("");
                         }
@@ -406,15 +349,13 @@ define([
         },
 
         _setDisabledAttr : function(value) {
-            console.log(this.id + "._setDisabledAttr");
-
+            logger.debug(this.id + "._setDisabledAttr");
             this.isInactive = !!value;
             this.comboBox.attr("disabled", this.isInactive);
         },
 
         uninitialize : function() {
             logger.debug(this.id + ".uninitialize");
-
             this.comboBox.destroyRecursive();
         }
 
