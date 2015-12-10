@@ -1,9 +1,8 @@
 /*jslint white:true, nomen: true, plusplus: true */
-/*global mx, mxui, mendix, require, console, define, module, logger, ChartJS, position, clearTimeout, setTimeout */
+/*global mx, mxui, mendix, require, console, define, module, logger */
 /*mendix */
 logger.level(logger.ALL);
-//dojo.require("refkit.lib.XPathSource");
-// Required module list. Remove unnecessary modules, you can always get them back from the boilerplate.
+
 define([
 
     // Mixins
@@ -126,18 +125,14 @@ define([
 
         applyContext : function(context, callback) {
             logger.debug(this.id + ".applyContext");
-            var trackId = context && context.getTrackID();
-
+            var trackId = context && context.getTrackId();
             if (trackId) {
-
                 var cs     = this.constraints,
-                    constr = this.currentConstr = cs ? this.matchTokens(cs, context.getTrackID()) : "";
-
+                    constr = this.currentConstr = cs ? this.matchTokens(cs, context.getTrackId()) : "";
                 if (constr != cs) {
                     // update constraints
                     this.xpathSource.updateConstraints(constr);
                 }
-
                 mx.data.get({
                     guid     : trackId,
                     callback : this.setSourceObject.bind(this)
@@ -244,7 +239,7 @@ define([
 
         objectUpdateNotification : function() {
             logger.debug(this.id + ".objectUpdateNotification");
-            this.getReferredObject(this.sourceObject.getAttribute(this.objreference));
+            this.getReferredObject(this.sourceObject.get(this.objreference));
         },
 
         changeReceived : function(guid, attr, value) {
@@ -306,12 +301,12 @@ define([
                 this.ignoreChange = true;
                 this.getGuid(dojo.hitch(this, function(guid) {
                     if (guid === "" && this.notfoundmf !== "") {
-                        mx.processor.createObject({
-                            className: this.referredEntity,
+                        mx.data.create({
+                            entity: this.referredEntity,
                             callback : function (obj) {
-                                obj.setAttribute(this.objattribute, value);
+                                obj.set(this.objattribute, value);
                                 obj.save({ callback : function () {}});
-                                this.sourceObject.addReference(this.objreference, obj.getGUID());
+                                this.sourceObject.addReference(this.objreference, obj.getGuid());
                                 this.sourceObject.save({
                                     callback : function () {
                                         this.ignoreChange = false;
@@ -325,7 +320,7 @@ define([
                             context  : null
                         });
                     } else if (guid != this.currentValue) {
-                        this.sourceObject.setAttribute(this.objreference, this.currentValue = guid);
+                        this.sourceObject.set(this.objreference, this.currentValue = guid);
                         this.ignoreChange = false;
                         this.executeMF(this.onchangemf);
                     }
@@ -339,12 +334,15 @@ define([
                 var context = new MxContext();
 
                 if (this.sourceObject) {
-                    context.setContext(this.sourceObject.getClass(), this.sourceObject.getGuid());
+                    context.setContext(this.sourceObject.getEntity(), this.sourceObject.getGuid());
                 }
 
-                mx.xas.action({
+                mx.data.action({
                     actionname : mf,
                     context    : context,
+                    store: {
+                      caller: this.mxform
+                    },
                     callback   : function() {
                         // ok
                     },
@@ -367,7 +365,7 @@ define([
 
         // TODO: use xpath from source
         getGuid : function(callback) {
-            console.log(this.id + ".getGuid");
+            logger.debug(this.id + ".getGuid", callback);
 
             var value = this.comboBox.attr("value"),
                 item  = this.comboBox.item;
@@ -390,7 +388,7 @@ define([
                     },
                     callback : function(objs) {
                         if (objs.length == 1) {
-                            callback(objs[0].getGUID());
+                            callback(objs[0].getGuid());
                         } else {
                             logger.warn(this.id + ".onBlur: There is more than one object found, so change is ignored");
 

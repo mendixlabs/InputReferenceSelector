@@ -32,7 +32,7 @@
                 <attributeType name="AutoNumber"/>
                 <attributeType name="Currency"/>
                 <attributeType name="Enum"/>
-                <attributeType name="Float"/>
+                <attributeType name="Decimal"/>
                 <attributeType name="Integer"/>
                 <attributeType name="Long"/>
                 <attributeType name="String"/>

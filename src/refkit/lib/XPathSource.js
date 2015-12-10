@@ -1,6 +1,5 @@
 /*jslint white:true, nomen: true, plusplus: true */
-/*global mx, mxui, mendix, require, console, define, module, logger, ChartJS, position, clearTimeout, setTimeout */
-/*mendix */
+/*global mx */
 
 define([
     "dojo/_base/declare",
@@ -27,10 +26,10 @@ define([
             this.emptys = kwArgs.searchempty;
             this.order  = kwArgs.sortorder;
 
-            var meta  = mx.metadata.getMetaEntity({ className : kwArgs.entity }),
-                type  = meta.getAttributeClass(kwArgs.attribute);
+            var meta = mx.meta.getEntity(kwArgs.entity),
+                type = meta.getAttributeType(kwArgs.attribute);
 
-            this.atype = /AutoNumber|Integer|Long/.test(type) ? "integer" : type == "Float" ? "float" : "string";
+            this.atype = /AutoNumber|Integer|Long/.test(type) ? "integer" : type == "Decimal" ? "float" : "string";
 
             if(type == 'Enum') {
                 this.isEnum = true;
@@ -107,7 +106,7 @@ define([
         /*            for (var i = 0; i < values.length; i++) {
                    constraint += i == 0 ? '['+ attr + '= "' + values[i] + '"' : ' or ' + attr + '= "' + values[i] + '"';
                 };*/
-                console.log(constraint);
+                //console.log(constraint);
             }
 
             if (value === "" && !this.emptys) {
