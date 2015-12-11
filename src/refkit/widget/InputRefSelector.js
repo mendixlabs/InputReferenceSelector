@@ -124,31 +124,31 @@ define([
             });
 
             if (callback) {
-              callback();
+                callback();
             }
         },
 
         actSetupInput : function(callback) {
             logger.debug(this.id + ".actSetupInput");
 
-        		if (!this.comboBox) {
-        			this.comboBox = new ComboBox({
-        				store        : this.xpathSource,
-        				queryExpr    : "${0}",
-        				searchAttr   : this.objattribute,
-        				searchDelay  : this.searchdelay,
-        				tabIndex     : 0,
-        				hasDownArrow : false,
-        				autoComplete : this.autocomplete
-        			});
-        		}
+                if (!this.comboBox) {
+                    this.comboBox = new ComboBox({
+                        store        : this.xpathSource,
+                        queryExpr    : "${0}",
+                        searchAttr   : this.objattribute,
+                        searchDelay  : this.searchdelay,
+                        tabIndex     : 0,
+                        hasDownArrow : false,
+                        autoComplete : this.autocomplete
+                    });
+                }
 
             this.domNode.appendChild(this.comboBox.domNode);
             dojo.connect(this.comboBox, "onChange", this.valueChange.bind(this));
             this.comboBox.domNode.removeAttribute("tabIndex");
 
             if (callback) {
-              callback();
+                callback();
             }
         },
 
@@ -166,13 +166,13 @@ define([
 
             if(obj) {
                 if (!this.isInactive) {
-                  this.comboBox.attr("disabled", false);
+                    this.comboBox.attr("disabled", false);
                 }
 
                 var guid = obj.getGuid();
                 var objectHandle = this.subscribe({
-                  guid: obj.getGuid(),
-                  callback: this.changeReceived.bind(this)
+                    guid: obj.getGuid(),
+                    callback: this.changeReceived.bind(this)
                 });
                 this._handles = [ objectHandle ];
                 this.getReferredObject(obj.get(this.objreference));
@@ -217,8 +217,8 @@ define([
             logger.debug(this.id + ".setDisplayValue", value);
             this.ignoreChange = true;
 
-        		if (this.comboBox) {
-        			this.comboBox.attr("value", value);
+            if (this.comboBox) {
+                this.comboBox.attr("value", value);
             }
 
             var self = this;
@@ -288,10 +288,10 @@ define([
                         caller: this.mxform
                     },
                     callback   : function() {
-                        // ok
+                        logger.debug(this.id + ".executeMF.OK");
                     },
                     error      : function() {
-                        // error
+                        logger.debug(this.id + ".executeMF.error");
                     }
                 });
             }
@@ -302,7 +302,7 @@ define([
             logger.debug(this.id + ".matchTokens");
             var newstr = "";
             if (str !== null && str !== "") {
-              newstr = str.match(/\[%CurrentObject%\]/) !== null ? str.replace(/\[%CurrentObject%\]/g, mendixguid) : str;
+                newstr = str.match(/\[%CurrentObject%\]/) !== null ? str.replace(/\[%CurrentObject%\]/g, mendixguid) : str;
             }
             return newstr;
         },

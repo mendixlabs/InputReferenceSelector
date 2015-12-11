@@ -57,7 +57,7 @@ define([
                         callback(objs, args);
                     },
                     error : function() {
-                        // do something
+                        logger.debug(this.id + "._fetchItems.error");
                     }
                 });
             } else {
@@ -95,7 +95,7 @@ define([
                 break;
             }
 
-            if(this.isEnum && this.metaEntity){
+            if (this.isEnum && this.metaEntity) {
                 var values = this.mapEnumValues(value, attr);
                 var constrArr = dojo.map(values, function(item, index) {
                     return attr + '= "' + item + '"';
@@ -103,9 +103,9 @@ define([
 
                 constraint = '[' + constrArr.join(' or ') + ']';
 
-        /*            for (var i = 0; i < values.length; i++) {
-                   constraint += i == 0 ? '['+ attr + '= "' + values[i] + '"' : ' or ' + attr + '= "' + values[i] + '"';
-                };*/
+                //for (var i = 0; i < values.length; i++) {
+                //   constraint += i == 0 ? '['+ attr + '= "' + values[i] + '"' : ' or ' + attr + '= "' + values[i] + '"';
+                //}
                 //console.log(constraint);
             }
 
@@ -113,13 +113,11 @@ define([
                 return;
             }
 
-            if (constraint === ''){
+            if (constraint === '') {
                 constraint = "[" + this.method + "(" + attr + ",'" + value + "')";
-
                 if (this.method == "starts-with") {
                     constraint += " or " + attr + "='" + value + "'";
                 }
-
                 constraint += "]";
             }
 
@@ -138,7 +136,7 @@ define([
             return label;
         },
 
-        mapEnumValues : function(value, attr){
+        mapEnumValues : function(value, attr) {
             var captions = [];
             var map = this.metaEntity.getEnumMap(attr);
 
