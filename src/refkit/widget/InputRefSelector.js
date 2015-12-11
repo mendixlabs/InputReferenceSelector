@@ -1,7 +1,7 @@
 /*jslint white:true, nomen: true, plusplus: true */
 /*global mx, mxui, mendix, require, console, define, module, logger */
 /*mendix */
-logger.level(logger.ALL);
+//logger.level(logger.ALL);
 
 define([
     "dojo/_base/declare", "mxui/widget/_WidgetBase", "dijit/_TemplatedMixin",
@@ -61,10 +61,10 @@ define([
             logger.debug(this.id + ".postCreate");
             this.sortParams = [];
             mendix.lang.sequence([
-                "actParseConfig",
-                "actSetupSource",
-                "actSetupInput"
-            ], null, this);
+                dojoLang.hitch(this, this.actParseConfig),
+                dojoLang.hitch(this, this.actSetupSource),
+                dojoLang.hitch(this, this.actSetupInput)
+            ]);
         },
 
         applyContext : function(context, callback) {
@@ -194,12 +194,13 @@ define([
         },
 
         getReferredObject : function(guid) {
-            logger.debug(this.id + ".getReferredObject");
+            logger.debug(this.id + ".getReferredObject", guid);
             this.currentValue = guid;
             if (guid) {
                 mx.data.get({
                     guid     : guid,
                     callback : function(obj) {
+                        logger.debug(this.id + ".getReferredObject.callback", obj);
                         if (obj.isEnum(this.objattribute)){
                             this.setDisplayValue(obj.getEnumCaption(this.objattribute));
                         } else {
