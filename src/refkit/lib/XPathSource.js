@@ -1,5 +1,5 @@
 /*jslint white:true, nomen: true, plusplus: true */
-/*global mx */
+/*global mx,dojo,logger */
 
 define([
     "dojo/_base/declare",
@@ -21,7 +21,7 @@ define([
             this.id = kwArgs.caller + '.XPathSource';
             this.entity = kwArgs.entity;
             this.limit  = kwArgs.limit;
-            this.method = kwArgs.fetchmethod == "startswith" ? "starts-with" : kwArgs.fetchmethod;
+            this.method = kwArgs.fetchmethod === "startswith" ? "starts-with" : kwArgs.fetchmethod;
             this.xpath  = "//" + this.entity + kwArgs.constraints;
             this.emptys = kwArgs.searchempty;
             this.order  = kwArgs.sortorder;
@@ -29,9 +29,9 @@ define([
             var meta = mx.meta.getEntity(kwArgs.entity),
                 type = meta.getAttributeType(kwArgs.attribute);
 
-            this.atype = /AutoNumber|Integer|Long/.test(type) ? "integer" : type == "Decimal" ? "float" : "string";
+            this.atype = /AutoNumber|Integer|Long/.test(type) ? "integer" : type === "Decimal" ? "float" : "string";
 
-            if(type == 'Enum') {
+            if(type === 'Enum') {
                 this.isEnum = true;
                 this.metaEntity = meta;
             }
@@ -78,12 +78,12 @@ define([
 
                 //value = mx.parser.escapeQuotesInString(query[i]); // Function not available in 3.0 client
 
-                if (type != "string") {
+                if (type !== "string") {
                     if (isNaN(value)) {
                         return;
                     }
 
-                    if (type == "integer") {
+                    if (type === "integer") {
                         if (!/^[0-9]+$/.test(value)) { // isNaN("1.") == false
                             return;
                         }
@@ -115,7 +115,7 @@ define([
 
             if (constraint === '') {
                 constraint = "[" + this.method + "(" + attr + ",'" + value + "')";
-                if (this.method == "starts-with") {
+                if (this.method === "starts-with") {
                     constraint += " or " + attr + "='" + value + "'";
                 }
                 constraint += "]";

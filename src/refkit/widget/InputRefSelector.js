@@ -1,5 +1,5 @@
 /*jslint white:true, nomen: true, plusplus: true */
-/*global mx, mxui, mendix, require, console, define, module, logger */
+/*global mx, mxui, mendix, require, console, define, module, logger, declare */
 /*mendix */
 //logger.level(logger.ALL);
 
@@ -68,12 +68,12 @@ define([
         },
 
         applyContext : function(context, callback) {
-            logger.debug(this.id + ".applyContext");
+            logger.debug(this.id + ".applyContext", context, callback);
             var trackId = context && context.getTrackId();
             if (trackId) {
                 var cs     = this.constraints,
                     constr = this.currentConstr = cs ? this.matchTokens(cs, context.getTrackId()) : "";
-                if (constr != cs) {
+                if (constr !== cs) {
                     // update constraints
                     this.xpathSource.updateConstraints(constr);
                 }
@@ -91,7 +91,7 @@ define([
         },
 
         actParseConfig : function(callback) {
-            logger.debug(this.id + ".parseConfig");
+            logger.debug(this.id + ".parseConfig", callback);
             var splits    = this.objreference.split("/"),
                 sortAttrs = this.sortattrs.split(";"),
                 sortOrder = this.sortorder.split(";");
@@ -110,7 +110,7 @@ define([
         },
 
         actSetupSource : function(callback) {
-            logger.debug(this.id + ".actSetupSource");
+            logger.debug(this.id + ".actSetupSource", callback);
 
             this.xpathSource = new XPathSource({
                 caller      : this.id,
@@ -129,7 +129,7 @@ define([
         },
 
         actSetupInput : function(callback) {
-            logger.debug(this.id + ".actSetupInput");
+            logger.debug(this.id + ".actSetupInput", callback);
 
                 if (!this.comboBox) {
                     this.comboBox = new ComboBox({
@@ -153,7 +153,7 @@ define([
         },
 
         setSourceObject : function(obj) {
-            logger.debug(this.id + ".setSourceObject");
+            logger.debug(this.id + ".setSourceObject", obj);
 
             this.sourceObject = obj;
 
@@ -164,16 +164,17 @@ define([
                 this._handles = [];
             }
 
-            if(obj) {
+            if (obj) {
+
                 if (!this.isInactive) {
                     this.comboBox.attr("disabled", false);
                 }
 
-                var guid = obj.getGuid();
                 var objectHandle = this.subscribe({
                     guid: obj.getGuid(),
-                    callback: this.changeReceived.bind(this)
+                    callback: dojoLang.hitch(this, this.changeReceived)
                 });
+
                 this._handles = [ objectHandle ];
                 this.getReferredObject(obj.get(this.objreference));
             } else {
@@ -182,12 +183,12 @@ define([
         },
 
         objectUpdateNotification : function() {
-            logger.debug(this.id + ".objectUpdateNotification");
+            logger.debug(this.id + ".objectUpdateNotification", arguments);
             this.getReferredObject(this.sourceObject.get(this.objreference));
         },
 
         changeReceived : function(guid, attr, value) {
-            logger.debug(this.id + ".changeReceived, change: ",arguments);
+            logger.debug(this.id + ".changeReceived, change: ", arguments);
             if (!this.ignoreChange) {
                 this.getReferredObject(value);
             }
@@ -264,7 +265,7 @@ define([
                             },
                             context  : null
                         });
-                    } else if (guid != this.currentValue) {
+                    } else if (guid !== this.currentValue) {
                         this.sourceObject.set(this.objreference, this.currentValue = guid);
                         this.ignoreChange = false;
                         this.executeMF(this.onchangemf);
@@ -272,6 +273,8 @@ define([
                 }));
             }
         },
+
+        resize: function () {},
 
         executeMF : function (mf) {
             logger.debug(this.id + ".executeMF", mf);
@@ -300,7 +303,7 @@ define([
 
         // TODO: Recheck in 3.0
         matchTokens : function(str, mendixguid){
-            logger.debug(this.id + ".matchTokens");
+            logger.debug(this.id + ".matchTokens", arguments);
             var newstr = "";
             if (str !== null && str !== "") {
                 newstr = str.match(/\[%CurrentObject%\]/) !== null ? str.replace(/\[%CurrentObject%\]/g, mendixguid) : str;
@@ -332,7 +335,7 @@ define([
                         limit : 2 // then we know if there is more than one object meeting the constraint
                     },
                     callback : function(objs) {
-                        if (objs.length == 1) {
+                        if (objs.length === 1) {
                             callback(objs[0].getGuid());
                         } else {
                             logger.warn(this.id + ".onBlur: There is more than one object found, so change is ignored");
