@@ -55,6 +55,8 @@ define([
         // dojo.declare.constructor is called to construct the widget instance. Implement to initialize non-primitive properties.
         constructor: function() {
             this._handles = [];
+            // Uncomment next line to start debugging
+            //logger.level(logger.DEBUG);
         },
 
         postCreate : function() {
@@ -281,22 +283,29 @@ define([
             if (mf) {
                 var context = new MxContext();
 
+                var params = {
+                    applyto: "selection",
+                    actionname: mf,
+                    context: context,
+                    guids: []
+                };
+
                 if (this.sourceObject) {
                     context.setContext(this.sourceObject.getEntity(), this.sourceObject.getGuid());
+                    params.guids = [this.sourceObject.getGuid()];
                 }
 
                 mx.data.action({
-                    actionname : mf,
-                    context    : context,
+                    params: params,
                     store: {
                         caller: this.mxform
                     },
-                    callback   : function() {
+                    callback   : dojoLang.hitch(this, function() {
                         logger.debug(this.id + ".executeMF.OK");
-                    },
-                    error      : function() {
+                    }),
+                    error      : dojoLang.hitch(this, function() {
                         logger.debug(this.id + ".executeMF.error");
-                    }
+                    })
                 });
             }
         },
