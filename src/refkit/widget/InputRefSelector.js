@@ -5,12 +5,12 @@
 
 define([
     "dojo/_base/declare", "mxui/widget/_WidgetBase", "dijit/_TemplatedMixin",
-    "mxui/dom", "dojo/dom", "dojo/_base/array", "dojo/_base/lang",
+    "mxui/dom", "dojo/dom", "dojo/_base/array", "dojo/_base/lang", "dojo/dom-construct", "dojo/dom-class",
     "mendix/lib/MxContext", "dijit/form/ComboBox",
     "refkit/lib/XPathSource",
     "refkit/lib/jquery",
     "dojo/text!refkit/templates/InputReferenceSelector.html"
-], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoArray, dojoLang, MxContext, ComboBox, XPathSource, _jQuery, template) {
+], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoArray, dojoLang, dojoConstruct, domClass, MxContext, ComboBox, XPathSource, _jQuery, template) {
 
     "use strict";
 
@@ -177,7 +177,13 @@ define([
                     callback: dojoLang.hitch(this, this.changeReceived)
                 });
 
-                this._handles = [ objectHandle ];
+                var validationHandle = this.subscribe({
+                    guid: obj.getGuid(),
+                    val: true,
+                    callback: dojoLang.hitch(this, this._handleValidation)
+                });
+
+                this._handles = [ objectHandle, validationHandle ];
                 this.getReferredObject(obj.get(this.objreference));
             } else {
                 this.comboBox.attr("disabled", true);
@@ -220,6 +226,7 @@ define([
         setDisplayValue : function(value) {
             logger.debug(this.id + ".setDisplayValue", value);
             this.ignoreChange = true;
+            this._clearValidations();
 
             if (this.comboBox) {
                 this.comboBox.attr("value", value);
@@ -365,6 +372,47 @@ define([
             logger.debug(this.id + "._setDisabledAttr");
             this.isInactive = !!value;
             this.comboBox.attr("disabled", this.isInactive);
+        },
+
+        _handleValidation: function(validations) {
+            logger.debug(this.id + "._handleValidation");
+            this._clearValidations();
+
+            var validation = validations[0],
+                message = validation.getReasonByAttribute(this.objreference);
+
+            if (this.readOnly) {
+                validation.removeAttribute(this.objreference);
+            } else if (message) {
+                this._addValidation(message);
+                validation.removeAttribute(this.objreference);
+            }
+        },
+
+        _clearValidations: function() {
+            logger.debug(this.id + "._clearValidations");
+            domClass.toggle(this.domNode, "has-error", false);
+            dojoConstruct.destroy(this._alertDiv);
+            this._alertDiv = null;
+        },
+
+        _showError: function(message) {
+            logger.debug(this.id + "._showError");
+            if (this._alertDiv !== null) {
+                dojoHtml.set(this._alertDiv, message);
+                return true;
+            }
+            this._alertDiv = dojoConstruct.create("div", {
+                "class": "alert alert-danger",
+                "innerHTML": message
+            });
+            dojoConstruct.place(this._alertDiv, this.domNode);
+            domClass.toggle(this.domNode, "has-error", true);
+        },
+
+        _addValidation: function(message) {
+            logger.debug(this.id + "._addValidation");
+            this._showError(message);
         },
 
         uninitialize : function() {
