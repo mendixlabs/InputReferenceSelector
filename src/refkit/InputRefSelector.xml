@@ -62,6 +62,11 @@
             <category>Behavior</category>
             <description>Search on empty input</description>
         </property>
+        <property key="searchEmptyOnFocus" type="boolean" defaultValue="false">
+            <caption>Searching empty on focus</caption>
+            <category>Behavior</category>
+            <description>If the value is empty and you focus on the inputbox, start a search (so it gives you a list with suggestions)</description>
+        </property>
         <property key="suggestions" type="integer" defaultValue="5">
             <caption>Number of suggestions</caption>
             <category>Behavior</category>

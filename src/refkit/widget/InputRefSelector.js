@@ -40,6 +40,7 @@ define([
         notfoundmf   : "",
         searchdelay  : 300,
         searchempty  : true,
+        searchEmptyOnFocus : false,
         sortattrs    : "",
         sortorder    : "",
 
@@ -156,10 +157,17 @@ define([
             this.domNode.appendChild(this.comboBox.domNode);
 
             dojo.connect(this.comboBox, "onChange", this.valueChange.bind(this));
+            dojo.connect(this.comboBox, "onFocus", this._onFocus.bind(this));
 
             this.comboBox.domNode.removeAttribute("tabIndex");
 
             mendix.lang.nullExec(callback);
+        },
+
+        _onFocus: function (evt) {
+            if (this.searchEmptyOnFocus && this.comboBox.value === "") {
+                this.comboBox._startSearchAll();
+            }
         },
 
         setSourceObject : function(obj) {
