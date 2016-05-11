@@ -1,16 +1,23 @@
-/*jslint white:true, nomen: true, plusplus: true */
-/*global mx, mxui, mendix, require, console, define, module, logger, declare */
-/*mendix */
-//logger.level(logger.ALL);
-
 define([
-    "dojo/_base/declare", "mxui/widget/_WidgetBase", "dijit/_TemplatedMixin",
-    "mxui/dom", "dojo/dom", "dojo/_base/array", "dojo/_base/lang", "dojo/dom-construct", "dojo/dom-class",
-    "mendix/lib/MxContext", "dijit/form/ComboBox",
+    "dojo/_base/declare",
+    "mxui/widget/_WidgetBase",
+    "dijit/_TemplatedMixin",
+
+    "mxui/dom",
+    "dojo/dom",
+    "dojo/_base/array",
+    "dojo/_base/lang",
+    "dojo/_base/html",
+    "dojo/dom-construct",
+    "dojo/dom-class",
+
+    "mendix/lib/MxContext",
+    "dijit/form/ComboBox",
+
     "refkit/lib/XPathSource",
     "refkit/lib/jquery",
     "dojo/text!refkit/templates/InputReferenceSelector.html"
-], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoArray, dojoLang, dojoConstruct, domClass, MxContext, ComboBox, XPathSource, _jQuery, template) {
+], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoArray, dojoLang, dojoHtml, dojoConstruct, domClass, MxContext, ComboBox, XPathSource, _jQuery, template) {
 
     "use strict";
 
@@ -50,50 +57,55 @@ define([
         isInactive     : false,
 
         _handles: null,
-        _contextObj: null,
 
         // dojo.declare.constructor is called to construct the widget instance. Implement to initialize non-primitive properties.
         constructor: function() {
             this._handles = [];
-            // Uncomment next line to start debugging
-            //logger.level(logger.DEBUG);
         },
 
         postCreate : function() {
             logger.debug(this.id + ".postCreate");
+
             this.sortParams = [];
+            dojoArray.forEach(this.ignored1, dojoLang.hitch(this, function (sortParam) {
+                this.sortParams.push([ sortParam.sortattrs, sortParam.sortorder ]);
+            }));
+
             mendix.lang.sequence([
                 dojoLang.hitch(this, this.actParseConfig),
                 dojoLang.hitch(this, this.actSetupSource),
                 dojoLang.hitch(this, this.actSetupInput)
             ]);
+
+
         },
 
-        applyContext : function(context, callback) {
-            logger.debug(this.id + ".applyContext", context, callback);
-            var trackId = context && context.getTrackId();
-            if (trackId) {
-                var cs     = this.constraints,
-                    constr = this.currentConstr = cs ? this.matchTokens(cs, context.getTrackId()) : "";
+        update : function(obj, callback) {
+            logger.debug(this.id + ".update");
+
+            if (obj) {
+
+                var cs = this.constraints,
+                    constr = this.currentConstr = cs ? this.matchTokens(cs, obj.getGuid()) : "";
+
                 if (constr !== cs) {
                     // update constraints
                     this.xpathSource.updateConstraints(constr);
                 }
+
                 mx.data.get({
-                    guid     : trackId,
+                    guid     : obj.getGuid(),
                     callback : this.setSourceObject.bind(this)
                 });
             } else {
                 this.setSourceObject(null);
             }
 
-            if (callback) {
-              callback();
-            }
+            mendix.lang.nullExec(callback);
         },
 
         actParseConfig : function(callback) {
-            logger.debug(this.id + ".parseConfig", callback);
+            logger.debug(this.id + ".parseConfig");
             var splits    = this.objreference.split("/"),
                 sortAttrs = this.sortattrs.split(";"),
                 sortOrder = this.sortorder.split(";");
@@ -106,13 +118,11 @@ define([
                 this.sortParams.push([attr, sortOrder[i]]);
             }
 
-            if (callback) {
-              callback();
-            }
+            mendix.lang.nullExec(callback);
         },
 
         actSetupSource : function(callback) {
-            logger.debug(this.id + ".actSetupSource", callback);
+            logger.debug(this.id + ".actSetupSource");
 
             this.xpathSource = new XPathSource({
                 caller      : this.id,
@@ -125,33 +135,31 @@ define([
                 sortorder   : this.sortParams
             });
 
-            if (callback) {
-                callback();
-            }
+            mendix.lang.nullExec(callback);
         },
 
         actSetupInput : function(callback) {
-            logger.debug(this.id + ".actSetupInput", callback);
+            logger.debug(this.id + ".actSetupInput");
 
-                if (!this.comboBox) {
-                    this.comboBox = new ComboBox({
-                        store        : this.xpathSource,
-                        queryExpr    : "${0}",
-                        searchAttr   : this.objattribute,
-                        searchDelay  : this.searchdelay,
-                        tabIndex     : 0,
-                        hasDownArrow : false,
-                        autoComplete : this.autocomplete
-                    });
-                }
+            if (!this.comboBox) {
+                this.comboBox = new ComboBox({
+                    store        : this.xpathSource,
+                    queryExpr    : "${0}",
+                    searchAttr   : this.objattribute,
+                    searchDelay  : this.searchdelay,
+                    tabIndex     : 0,
+                    hasDownArrow : false,
+                    autoComplete : this.autocomplete
+                });
+            }
 
             this.domNode.appendChild(this.comboBox.domNode);
+
             dojo.connect(this.comboBox, "onChange", this.valueChange.bind(this));
+
             this.comboBox.domNode.removeAttribute("tabIndex");
 
-            if (callback) {
-                callback();
-            }
+            mendix.lang.nullExec(callback);
         },
 
         setSourceObject : function(obj) {
@@ -167,7 +175,6 @@ define([
             }
 
             if (obj) {
-
                 if (!this.isInactive) {
                     this.comboBox.attr("disabled", false);
                 }
@@ -191,12 +198,12 @@ define([
         },
 
         objectUpdateNotification : function() {
-            logger.debug(this.id + ".objectUpdateNotification", arguments);
+            logger.debug(this.id + ".objectUpdateNotification");
             this.getReferredObject(this.sourceObject.get(this.objreference));
         },
 
         changeReceived : function(guid, attr, value) {
-            logger.debug(this.id + ".changeReceived, change: ", arguments);
+            logger.debug(this.id + ".changeReceived, change: ");
             if (!this.ignoreChange) {
                 this.getReferredObject(value);
             }
@@ -234,17 +241,17 @@ define([
 
             var self = this;
 
-            $('div#' + this.id).focusin(function() {
-                $(this).addClass('MxClient_Focus');
-                $(this).css('outline', '#333 auto 2px');
-                if ($('div#' + self.id + ' div').hasClass('dijitTextBoxFocused')) {
-                    $('div#' + self.id + ' div').css('outline', 'rgb(0, 0, 0) auto 0px');
+            $("div#" + this.id).focusin(function() {
+                $(this).addClass("MxClient_Focus");
+                $(this).css("outline", "#333 auto 2px");
+                if ($("div#" + self.id + " div").hasClass("dijitTextBoxFocused")) {
+                    $("div#" + self.id + " div").css("outline", "rgb(0, 0, 0) auto 0px");
                 }
             });
 
-            $('div#' + this.id).focusout(function() {
-                $(this).removeClass('MxClient_Focus');
-                $(this).css('outline', 'transparent auto 0px');
+            $("div#" + this.id).focusout(function() {
+                $(this).removeClass("MxClient_Focus");
+                $(this).css("outline", "transparent auto 0px");
             });
 
             setTimeout(function() { self.ignoreChange = false; }, 10);
@@ -329,19 +336,19 @@ define([
 
         // TODO: use xpath from source
         getGuid : function(callback) {
-            logger.debug(this.id + ".getGuid", callback);
+            logger.debug(this.id + ".getGuid");
 
             var value = this.comboBox.attr("value"),
-                item  = this.comboBox.item;
+            item  = this.comboBox.item;
 
             if (item) { // we already have an object
                 callback(item.getGuid());
             } else if (value !== "") { // find an object that meets our requirements
                 var attr   = this.objattribute,
-                    method = this.fetchmethod == "startswith" ? "starts-with" : this.fetchmethod,
-                    constr = "[" + method + "(" + attr + ",'" + value + "')";
+                method = this.fetchmethod === "startswith" ? "starts-with" : this.fetchmethod,
+                constr = "[" + method + "(" + attr + ",'" + value + "')";
 
-                constr += method == "starts-with" ? " or " + attr + "='" + value + "']" : "]";
+                constr += method === "starts-with" ? " or " + attr + "='" + value + "']" : "]";
 
                 var xpath = "//" + this.referredEntity + this.currentConstr + constr;
 
@@ -422,3 +429,5 @@ define([
 
     });
 });
+
+require(["refkit/widget/InputRefSelector"]);

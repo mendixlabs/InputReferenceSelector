@@ -1,5 +1,4 @@
-/*jslint white:true, nomen: true, plusplus: true */
-/*global mx,dojo,logger */
+/* jshint quotmark:false */
 
 define([
     "dojo/_base/declare",
@@ -35,6 +34,8 @@ define([
                 this.isEnum = true;
                 this.metaEntity = meta;
             }
+
+            console.log(this);
         },
 
         updateConstraints : function(constraints) {
