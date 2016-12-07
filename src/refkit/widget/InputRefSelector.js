@@ -17,11 +17,12 @@ define([
     "refkit/lib/XPathSource",
     "refkit/lib/jquery",
     "dojo/text!refkit/templates/InputReferenceSelector.html"
-], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoArray, dojoLang, dojoHtml, dojoConstruct, domClass, MxContext, ComboBox, XPathSource, _jQuery, template) {
+], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoArray, dojoLang, dojoHtml, dojoConstruct, domClass, MendixContext, ComboBox, XPathSource, _jQuery, template) {
 
     "use strict";
 
-    var $ = _jQuery.noConflict(true);
+    var $ = _jQuery.noConflict(true),
+        MxContext = MendixContext || mendix.lib.MxContext;
 
     // Declare widget.
     return declare("refkit.widget.InputRefSelector", [ _WidgetBase, _TemplatedMixin ], {
@@ -78,8 +79,6 @@ define([
                 dojoLang.hitch(this, this.actSetupSource),
                 dojoLang.hitch(this, this.actSetupInput)
             ]);
-
-
         },
 
         update : function(obj, callback) {
@@ -97,8 +96,8 @@ define([
 
                 mx.data.get({
                     guid     : obj.getGuid(),
-                    callback : this.setSourceObject.bind(this)
-                });
+                    callback : dojoLang.hitch(this, this.setSourceObject)
+                }, this);
             } else {
                 this.setSourceObject(null);
             }
@@ -227,16 +226,15 @@ define([
             if (guid) {
                 mx.data.get({
                     guid     : guid,
-                    callback : function(obj) {
+                    callback : dojoLang.hitch(this, function(obj) {
                         logger.debug(this.id + ".getReferredObject.callback", obj);
                         if (obj.isEnum(this.objattribute)){
                             this.setDisplayValue(obj.getEnumCaption(this.objattribute));
                         } else {
                             this.setDisplayValue(obj.get(this.objattribute));
                         }
-
-                    }.bind(this)
-                });
+                    })
+                }, this);
             } else {
                 this.setDisplayValue("");
             }
@@ -252,7 +250,6 @@ define([
             }
 
             var self = this;
-
             $("div#" + this.id).focusin(function() {
                 $(this).addClass("MxClient_Focus");
                 $(this).css("outline", "#333 auto 2px");
@@ -266,7 +263,9 @@ define([
                 $(this).css("outline", "transparent auto 0px");
             });
 
-            setTimeout(function() { self.ignoreChange = false; }, 10);
+            setTimeout(dojoLang.hitch(this, function() {
+                this.ignoreChange = false;
+            }), 10);
         },
 
         valueChange : function(value, target) {
@@ -351,7 +350,7 @@ define([
             logger.debug(this.id + ".getGuid");
 
             var value = this.comboBox.attr("value"),
-            item  = this.comboBox.item;
+                item  = this.comboBox.item;
 
             if (item) { // we already have an object
                 callback(item.getGuid());
