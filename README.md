@@ -1,3 +1,7 @@
+### This fork includes:
+
++ an option to set placeholder text for the input 
+
 # Input Reference Selector
 A reference selector in which you can type away, while auto-completion and suggestions will help you to select an object.
 

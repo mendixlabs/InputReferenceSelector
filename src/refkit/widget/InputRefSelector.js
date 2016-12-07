@@ -43,6 +43,7 @@ define([
         searchEmptyOnFocus : false,
         sortattrs    : "",
         sortorder    : "",
+        placeholderText: "",
 
         // Internal
         sourceObject   : null,
@@ -160,6 +161,10 @@ define([
             dojo.connect(this.comboBox, "onFocus", this._onFocus.bind(this));
 
             this.comboBox.domNode.removeAttribute("tabIndex");
+            // set placeholder
+            var inputEl = this.comboBox.domNode.querySelector('input.dijitInputInner')
+            inputEl.placeholder = this.placeholderText
+
 
             mendix.lang.nullExec(callback);
         },
