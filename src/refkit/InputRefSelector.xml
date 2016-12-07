@@ -19,6 +19,11 @@
         YII=
     </icon>
     <properties>
+      <property key="placeholderText" type="string" required="false">
+          <caption>Placeholder Text</caption>
+          <category>Appearance</category>
+          <description>The text that displays before a user focuses the input. i.e. "Please select an option"</description>
+      </property>
         <property key="objreference" type="entity" isPath="yes" pathType="reference">
             <caption>Association</caption>
             <category>Data source</category>
