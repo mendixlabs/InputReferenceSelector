@@ -1,12 +1,11 @@
 {
   "name": "refkit",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "",
   "license": "",
   "author": "",
   "private": true,
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "del": "^2.2.2",
     "gulp": "^3.9.1",
