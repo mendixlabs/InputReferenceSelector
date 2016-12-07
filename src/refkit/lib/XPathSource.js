@@ -34,8 +34,6 @@ define([
                 this.isEnum = true;
                 this.metaEntity = meta;
             }
-
-            console.log(this);
         },
 
         updateConstraints : function(constraints) {

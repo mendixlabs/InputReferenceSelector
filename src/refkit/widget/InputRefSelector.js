@@ -103,7 +103,7 @@ define([
                 this.setSourceObject(null);
             }
 
-            mendix.lang.nullExec(callback);
+            this._executeCallback(callback, "update");
         },
 
         actParseConfig : function(callback) {
@@ -120,7 +120,7 @@ define([
                 this.sortParams.push([attr, sortOrder[i]]);
             }
 
-            mendix.lang.nullExec(callback);
+            this._executeCallback(callback, "parseConfig");
         },
 
         actSetupSource : function(callback) {
@@ -137,7 +137,7 @@ define([
                 sortorder   : this.sortParams
             });
 
-            mendix.lang.nullExec(callback);
+            this._executeCallback(callback, "actSetupSource");
         },
 
         actSetupInput : function(callback) {
@@ -166,7 +166,7 @@ define([
             inputEl.placeholder = this.placeholderText
 
 
-            mendix.lang.nullExec(callback);
+            this._executeCallback(callback, "actSetupInput");
         },
 
         _onFocus: function (evt) {
@@ -176,7 +176,7 @@ define([
         },
 
         setSourceObject : function(obj) {
-            logger.debug(this.id + ".setSourceObject", obj);
+            logger.debug(this.id + ".setSourceObject", obj ? obj.getGuid() : null);
 
             this.sourceObject = obj;
 
@@ -433,6 +433,13 @@ define([
         _addValidation: function(message) {
             logger.debug(this.id + "._addValidation");
             this._showError(message);
+        },
+
+        _executeCallback: function (cb, from) {
+            logger.debug(this.id + "._executeCallback" + (from ? " from: " + from : ""));
+            if (cb && typeof cb === "function") {
+              cb();
+            }
         },
 
         uninitialize : function() {
