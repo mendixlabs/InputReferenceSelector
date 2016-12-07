@@ -162,9 +162,8 @@ define([
 
             this.comboBox.domNode.removeAttribute("tabIndex");
             // set placeholder
-            var inputEl = this.comboBox.domNode.querySelector('input.dijitInputInner')
-            inputEl.placeholder = this.placeholderText
-
+            var inputEl = this.comboBox.domNode.querySelector("input.dijitInputInner");
+            inputEl.placeholder = this.placeholderText;
 
             this._executeCallback(callback, "actSetupInput");
         },

@@ -19,5 +19,6 @@
     // Environments
     "browser"  : true,
     "devel"    : true,
-    "dojo"     : true
+    "dojo"     : true,
+    "-W084" : true
 }
