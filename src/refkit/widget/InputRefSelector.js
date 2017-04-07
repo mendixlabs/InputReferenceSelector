@@ -2,6 +2,7 @@ define([
     "dojo/_base/declare",
     "mxui/widget/_WidgetBase",
     "dijit/_TemplatedMixin",
+    "dijit/_FocusMixin",
 
     "mxui/dom",
     "dojo/dom",
@@ -17,15 +18,14 @@ define([
     "refkit/lib/XPathSource",
     "refkit/lib/jquery",
     "dojo/text!refkit/templates/InputReferenceSelector.html"
-], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoArray, dojoLang, dojoHtml, dojoConstruct, domClass, MendixContext, ComboBox, XPathSource, _jQuery, template) {
+], function (declare, _WidgetBase, _TemplatedMixin, _FocusMixin, dom, dojoDom, dojoArray, dojoLang, dojoHtml, dojoConstruct, domClass, MendixContext, ComboBox, XPathSource, _jQuery, template) {
 
     "use strict";
 
-    var $ = _jQuery.noConflict(true),
-        MxContext = MendixContext || mendix.lib.MxContext;
+    var MxContext = MendixContext || mendix.lib.MxContext;
 
     // Declare widget.
-    return declare("refkit.widget.InputRefSelector", [ _WidgetBase, _TemplatedMixin ], {
+    return declare("refkit.widget.InputRefSelector", [ _WidgetBase, _TemplatedMixin, _FocusMixin ], {
 
         // Template path
         templateString: template,
@@ -157,7 +157,7 @@ define([
             this.domNode.appendChild(this.comboBox.domNode);
 
             dojo.connect(this.comboBox, "onChange", this.valueChange.bind(this));
-            dojo.connect(this.comboBox, "onFocus", this._onFocus.bind(this));
+            dojo.connect(this.comboBox, "onFocus", this._onFocusCombo.bind(this));
 
             this.comboBox.domNode.removeAttribute("tabIndex");
             // set placeholder
@@ -167,7 +167,7 @@ define([
             this._executeCallback(callback, "actSetupInput");
         },
 
-        _onFocus: function (evt) {
+        _onFocusCombo: function (evt) {
             if (this.searchEmptyOnFocus && this.comboBox.value === "") {
                 this.comboBox._startSearchAll();
             }
@@ -249,23 +249,17 @@ define([
                 this.comboBox.attr("value", value);
             }
 
-            var self = this;
-            $("div#" + this.id).focusin(function() {
-                $(this).addClass("MxClient_Focus");
-                $(this).css("outline", "#333 auto 2px");
-                if ($("div#" + self.id + " div").hasClass("dijitTextBoxFocused")) {
-                    $("div#" + self.id + " div").css("outline", "rgb(0, 0, 0) auto 0px");
-                }
-            });
-
-            $("div#" + this.id).focusout(function() {
-                $(this).removeClass("MxClient_Focus");
-                $(this).css("outline", "transparent auto 0px");
-            });
-
             setTimeout(dojoLang.hitch(this, function() {
                 this.ignoreChange = false;
             }), 10);
+        },
+
+        _onFocus: function () {
+            domClass.add(this.domNode, "MxClient_Focus");   
+        },
+
+        _onBlur: function () {
+            domClass.remove(this.domNode, "MxClient_Focus");
         },
 
         valueChange : function(value, target) {
