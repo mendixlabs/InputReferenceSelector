@@ -2,6 +2,7 @@ define([
     "dojo/_base/declare",
     "mxui/widget/_WidgetBase",
     "dijit/_TemplatedMixin",
+    "dijit/_FocusMixin",
 
     "mxui/dom",
     "dojo/dom",
@@ -15,17 +16,15 @@ define([
     "dijit/form/ComboBox",
 
     "refkit/lib/XPathSource",
-    "refkit/lib/jquery",
     "dojo/text!refkit/templates/InputReferenceSelector.html"
-], function (declare, _WidgetBase, _TemplatedMixin, dom, dojoDom, dojoArray, dojoLang, dojoHtml, dojoConstruct, domClass, MendixContext, ComboBox, XPathSource, _jQuery, template) {
+], function (declare, _WidgetBase, _TemplatedMixin, _FocusMixin, dom, dojoDom, dojoArray, lang, dojoHtml, dojoConstruct, domClass, MendixContext, ComboBox, XPathSource, template) {
 
     "use strict";
 
-    var $ = _jQuery.noConflict(true),
-        MxContext = MendixContext || mendix.lib.MxContext;
+    var MxContext = MendixContext || mendix.lib.MxContext;
 
     // Declare widget.
-    return declare("refkit.widget.InputRefSelector", [ _WidgetBase, _TemplatedMixin ], {
+    return declare("refkit.widget.InputRefSelector", [ _WidgetBase, _TemplatedMixin, _FocusMixin ], {
 
         // Template path
         templateString: template,
@@ -70,14 +69,14 @@ define([
             logger.debug(this.id + ".postCreate");
 
             this.sortParams = [];
-            dojoArray.forEach(this.ignored1, dojoLang.hitch(this, function (sortParam) {
+            dojoArray.forEach(this.ignored1, lang.hitch(this, function (sortParam) {
                 this.sortParams.push([ sortParam.sortattrs, sortParam.sortorder ]);
             }));
 
             mendix.lang.sequence([
-                dojoLang.hitch(this, this.actParseConfig),
-                dojoLang.hitch(this, this.actSetupSource),
-                dojoLang.hitch(this, this.actSetupInput)
+                lang.hitch(this, this.actParseConfig),
+                lang.hitch(this, this.actSetupSource),
+                lang.hitch(this, this.actSetupInput)
             ]);
         },
 
@@ -96,7 +95,7 @@ define([
 
                 mx.data.get({
                     guid     : obj.getGuid(),
-                    callback : dojoLang.hitch(this, this.setSourceObject)
+                    callback : lang.hitch(this, this.setSourceObject)
                 }, this);
             } else {
                 this.setSourceObject(null);
@@ -157,7 +156,7 @@ define([
             this.domNode.appendChild(this.comboBox.domNode);
 
             dojo.connect(this.comboBox, "onChange", this.valueChange.bind(this));
-            dojo.connect(this.comboBox, "onFocus", this._onFocus.bind(this));
+            dojo.connect(this.comboBox, "onFocus", this._onFocusCombo.bind(this));
 
             this.comboBox.domNode.removeAttribute("tabIndex");
             // set placeholder
@@ -167,7 +166,7 @@ define([
             this._executeCallback(callback, "actSetupInput");
         },
 
-        _onFocus: function (evt) {
+        _onFocusCombo: function (evt) {
             if (this.searchEmptyOnFocus && this.comboBox.value === "") {
                 this.comboBox._startSearchAll();
             }
@@ -179,9 +178,9 @@ define([
             this.sourceObject = obj;
 
             if (this._handles) {
-                dojoArray.forEach(this._handles, function (handle) {
-                    mx.data.unsubscribe(handle);
-                });
+                dojoArray.forEach(this._handles, lang.hitch(this, function (handle) {
+                    this.unsubscribe(handle);
+                }));
                 this._handles = [];
             }
 
@@ -192,13 +191,13 @@ define([
 
                 var objectHandle = this.subscribe({
                     guid: obj.getGuid(),
-                    callback: dojoLang.hitch(this, this.changeReceived)
+                    callback: lang.hitch(this, this.changeReceived)
                 });
 
                 var validationHandle = this.subscribe({
                     guid: obj.getGuid(),
                     val: true,
-                    callback: dojoLang.hitch(this, this._handleValidation)
+                    callback: lang.hitch(this, this._handleValidation)
                 });
 
                 this._handles = [ objectHandle, validationHandle ];
@@ -226,7 +225,7 @@ define([
             if (guid) {
                 mx.data.get({
                     guid     : guid,
-                    callback : dojoLang.hitch(this, function(obj) {
+                    callback : lang.hitch(this, function(obj) {
                         logger.debug(this.id + ".getReferredObject.callback", obj);
                         if (obj.isEnum(this.objattribute)){
                             this.setDisplayValue(obj.getEnumCaption(this.objattribute));
@@ -249,30 +248,24 @@ define([
                 this.comboBox.attr("value", value);
             }
 
-            var self = this;
-            $("div#" + this.id).focusin(function() {
-                $(this).addClass("MxClient_Focus");
-                $(this).css("outline", "#333 auto 2px");
-                if ($("div#" + self.id + " div").hasClass("dijitTextBoxFocused")) {
-                    $("div#" + self.id + " div").css("outline", "rgb(0, 0, 0) auto 0px");
-                }
-            });
-
-            $("div#" + this.id).focusout(function() {
-                $(this).removeClass("MxClient_Focus");
-                $(this).css("outline", "transparent auto 0px");
-            });
-
-            setTimeout(dojoLang.hitch(this, function() {
+            setTimeout(lang.hitch(this, function() {
                 this.ignoreChange = false;
             }), 10);
+        },
+
+        _onFocus: function () {
+            domClass.add(this.domNode, "MxClient_Focus");
+        },
+
+        _onBlur: function () {
+            domClass.remove(this.domNode, "MxClient_Focus");
         },
 
         valueChange : function(value, target) {
             logger.debug(this.id + ".valueChange", value, target);
             if (!this.ignoreChange) {
                 this.ignoreChange = true;
-                this.getGuid(dojoLang.hitch(this, function(guid) {
+                this.getGuid(lang.hitch(this, function(guid) {
                     if (guid === "" && this.notfoundmf !== "") {
                         mx.data.create({
                             entity: this.referredEntity,
@@ -310,7 +303,6 @@ define([
 
                 var params = {
                     applyto: "selection",
-                    actionname: mf,
                     context: context,
                     guids: []
                 };
@@ -320,15 +312,12 @@ define([
                     params.guids = [this.sourceObject.getGuid()];
                 }
 
-                mx.data.action({
+                mx.ui.action(mf, {
                     params: params,
-                    store: {
-                        caller: this.mxform
-                    },
-                    callback   : dojoLang.hitch(this, function() {
+                    callback   : lang.hitch(this, function() {
                         logger.debug(this.id + ".executeMF.OK");
                     }),
-                    error      : dojoLang.hitch(this, function() {
+                    error      : lang.hitch(this, function() {
                         logger.debug(this.id + ".executeMF.error");
                     })
                 });

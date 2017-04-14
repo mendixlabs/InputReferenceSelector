@@ -24,4 +24,10 @@
 	font-family: arial,helvetica,clean,sans-serif !important;
 }
 
+.refkitInputRefSelector.MxClient_Focus {
+	outline: #333 auto 2px;
+}
 
+.refkitInputRefSelector.MxClient_Focus .dijitTextBoxFocused div{
+	outline: rgb(0, 0, 0) auto 0px;
+}
