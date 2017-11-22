@@ -1,4 +1,5 @@
-# Input Reference Selector
+# Input Reference Selector [![Support](https://img.shields.io/badge/Mendix%20Support%3A-Community-orange.svg)](https://docs.mendix.com/community/app-store/app-store-content-support)
+
 A reference selector in which you can type away, while auto-completion and suggestions will help you to select an object.
 
 ## Contributing
